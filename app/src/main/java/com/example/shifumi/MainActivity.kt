@@ -7,10 +7,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.example.shifumi.navigation.ShifumiNavHost
 import com.example.shifumi.ui.theme.ShifumiTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,29 +20,29 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ShifumiTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
+                val navController = rememberNavController()
+                Scaffold(
+                    modifier = Modifier.fillMaxSize()
+                ) { innerPadding ->
+                    ShifumiNavHost(
+                        navController = navController,
+                        modifier = Modifier
+                            .padding(innerPadding) // <= on applique le padding du Scaffold
+                            .fillMaxSize()
                     )
                 }
+
+
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun PreviewApp() {
     ShifumiTheme {
-        Greeting("Android")
+        // Pour un aperçu statique, on peut afficher juste HomeScreen:
+        // HomeScreen {}
     }
 }
