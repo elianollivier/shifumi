@@ -6,6 +6,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,9 +18,12 @@ import kotlin.math.sqrt
 import kotlin.random.Random
 
 @Composable
-fun GameScreen() {
+fun GameVsComputerScreen() {
+
     var shakeCount by remember { mutableStateOf(0) }
-    var chosenWeapon by remember { mutableStateOf<String?>(null) }
+    var userWeapon by remember { mutableStateOf<String?>(null) }
+    var computerWeapon by remember { mutableStateOf<String?>(null) }
+    var result by remember { mutableStateOf<String?>(null) }
 
     val context = LocalContext.current
     val sensorManager = remember {
@@ -38,18 +42,26 @@ fun GameScreen() {
                     val z = it.values[2]
 
                     val magnitude = sqrt(x * x + y * y + z * z)
+
                     val threshold = 2.0f
 
                     if (magnitude > threshold) {
                         shakeCount++
                         if (shakeCount == 3) {
-                            chosenWeapon = getRandomWeapon()
+                            val userChoice = getRandomWeapon()
+                            userWeapon = userChoice
+
+                            val compChoice = getRandomWeapon()
+                            computerWeapon = compChoice
+
+                            result = compareWeapons(userChoice, compChoice)
+
                             shakeCount = 0
                         }
                     }
                 }
             }
-            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
         }
     }
 
@@ -66,21 +78,55 @@ fun GameScreen() {
         }
     }
 
+    // UI
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Secouages détectés : $shakeCount")
-        Spacer(modifier = Modifier.height(20.dp))
+        Text(text = "Version du shifumi contre l'ordinateur", textAlign = TextAlign.Center)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(text = "Nombre de tremblement : $shakeCount")
+
+        Spacer(modifier = Modifier.height(24.dp))
         Text(
-            text = chosenWeapon?.let { "Arme tirée : $it" } ?: "Aucune arme encore tirée",
+            text = "Ton arme : ${userWeapon ?: "Vide"}",
             textAlign = TextAlign.Center
         )
+        Text(
+            text = "Arme Ordi : ${computerWeapon ?: "Vide"}",
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+        Text(text = if (result == null) "Secoue 3 fois pour jouer" else "Résultat : $result")
+
+        Spacer(modifier = Modifier.height(24.dp))
+        Button(onClick = {
+            userWeapon = null
+            computerWeapon = null
+            result = null
+            shakeCount = 0
+        }) {
+            Text(text = "Rejouer")
+        }
     }
 }
 
 private fun getRandomWeapon(): String {
     val weapons = listOf("Pierre", "Feuille", "Ciseaux")
     return weapons[Random.nextInt(weapons.size)]
+}
+
+private fun compareWeapons(user: String, computer: String): String {
+    return when {
+        user == computer -> "Égalité"
+        user == "Pierre" && computer == "Ciseaux" -> "Gagné"
+        user == "Ciseaux" && computer == "Feuille" -> "Gagné"
+        user == "Feuille" && computer == "Pierre" -> "Gagné"
+        else -> "Perdu"
+    }
 }
