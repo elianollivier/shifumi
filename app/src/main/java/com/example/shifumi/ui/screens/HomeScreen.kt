@@ -13,7 +13,8 @@ import androidx.compose.ui.Modifier
 @Composable
 fun HomeScreen(
     onPlaySoloClicked: () -> Unit,
-    onPlayVsComputerClicked: () -> Unit
+    onPlayVsComputerClicked: () -> Unit,
+    onPlayStrategyClicked: () -> Unit
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -32,6 +33,13 @@ fun HomeScreen(
                 modifier = Modifier.wrapContentSize()
             ) {
                 Text(text = "Mode vs Ordinateur")
+            }
+
+            Button(
+                onClick = { onPlayStrategyClicked() },
+                modifier = Modifier.wrapContentSize()
+            ) {
+                Text(text = "Jeu Stratégique")
             }
         }
     }
